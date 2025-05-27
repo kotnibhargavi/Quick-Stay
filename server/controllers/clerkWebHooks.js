@@ -7,33 +7,32 @@ const clerkWebHooks = async (req,res)=>{
         // creating a svix instance with clerk web hook 
 
         const Whook = new Webhook(process.env.CLERK_WEBHOOK_SECRET)
-        console.log(Whook , "1")
+        
         //Getting headers
         const headers = {
             "svix-id" : req.headers["svix-id"],
             "svix-timestamp" : req.headers["svix-timestamp"],
             "svix-signature" : req.headers["svix-signature"],
         }
-        console.log(headers, "2") 
+        
         // Verifying headers
-        const isVerified = await Whook.verify(JSON.stringify(req.body),headers)
-        console.log(isVerified , "3")
+        console.log("Received webhook payload:", req.body);
+        await Whook.verify(JSON.stringify(req.body),headers)
+      
 
         // Getting from req body 
 
         const {data,type} = req.body 
-        console.log(req.body, "4" )
-        console.log(data, "5" )
-        console.log(type, "6" )
+        
 
         const userData = {
             _id : data.id,
-            email: data.email_addresses[0].email_address,
+            email: data.email_addresses && data.email_addresses[0] ? data.email_addresses[0].email_address : "default@example.com",
             username : data.first_name + data.last_name,
             image : data.image_url,
             }
         // Switch Case for different events 
-        console.log(userData, "7" )
+        
 
 
         switch (type) {
@@ -45,7 +44,7 @@ const clerkWebHooks = async (req,res)=>{
                 await User.findByIdAndUpdate(data.id,userData)
                 break;
             case "user.deleted":
-                await User.findByIdAndDelete(data.id)
+                await User.findByIdAndDelete(data.id);
                 break;
         
             default:
