@@ -1,4 +1,3 @@
-import { timeStamp } from "console"
 import mongoose from "mongoose"
 
 const userSchema = mongoose.Schema({
@@ -10,7 +9,7 @@ const userSchema = mongoose.Schema({
     recentSearchCities : {type : String, require:true},
 
 
-},{timeStamps:true});
+},{timestamps:true});
 
 
 const User = mongoose.model("User",userSchema);
