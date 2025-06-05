@@ -14,9 +14,6 @@ const Navbar = () => {
         { name: 'Experience', path: '/' },
         { name: 'Contact us', path: '/' },
     ];
-    
-    
-
     const [isScrolled, setIsScrolled] = React.useState(false);
     const [isMenuOpen, setIsMenuOpen] = React.useState(false);
     const {openSignIn} = useClerk()
