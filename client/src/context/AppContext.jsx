@@ -20,7 +20,15 @@ export const AppProvider = ({children}) => {
 
     const fetchUser = async()=>{
         try {
-            const {data} = await axios.get("/api/user", {headers:{Authorization:`Bearer ${await getToken()}`}})
+            const token = await getToken();
+            if (!token) {
+            toast.error("User not authenticated. No token found.");
+            return;
+            }
+            const { data } = await axios.get("/api/user", {
+            headers: { Authorization: `Bearer ${token}` }
+            });
+            // const {data} = await axios.get("/api/user", {headers:{Authorization:`Bearer ${await getToken()}`}})
             if(data.success){
                 setIsOwner(data.role === "hotelOwner");
                 setSearchedCities(data.recentSearchCities);

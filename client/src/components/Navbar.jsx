@@ -105,8 +105,8 @@ const Navbar = () => {
                         </a>
                     ))}
 
-                    {user&&(<button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all" onClick={()=>navigate("/owner")}>
-                        Dashboard
+                    {user&&(<button className="border px-4 py-1 text-sm font-light rounded-full cursor-pointer transition-all"  onClick={()=>isOwner ? navigate("/owner") : setShowHotelReg(true)}>
+                        {isOwner ? "Dashboard": "List Your Hotel"}
                     </button>)}
                     
                     {!user&& (<button className="bg-black text-white px-8 py-2.5 rounded-full transition-all duration-500" onClick={openSignIn}>

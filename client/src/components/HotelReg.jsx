@@ -1,13 +1,35 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { assets, cities } from '../assets/assets'
 import { useAppContext } from '../context/appContext'
+import toast from "react-hot-toast"
 
 const HotelReg = () => {
-  const {setShowHotelReg} = useAppContext() 
-  return (
-    <div className='fixed inset-0 z-[100] flex items-center justify-center bg-black/70'>
+  const {setShowHotelReg,axios,getToken,setIsOwner} = useAppContext() 
+  const [name,setName] = useState("")
+  const [address,setAddress] = useState("")
+  const [contact,setContact] = useState("")
+  const [city,setCity] = useState("")
 
-      <form className='flex bg-white rounded-xl max-w-4xl max-md:mx-2'>
+  const onSubmitHandler = async(event)=>{
+    try {
+      event.preventDefault()
+      const {data} = await axios.post(`/api/hotels`, { name, contact, address, city }, { headers: { Authorization: `Bearer ${await getToken()}` } }) 
+      if(data.success){
+        toast.success(data.message)
+        setIsOwner(true)
+        setShowHotelReg(false)
+
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message)
+    }
+  }
+
+  return (
+    <div onClick={()=>setShowHotelReg(false)} className='fixed inset-0 z-[100] flex items-center justify-center bg-black/70'>
+      <form onSubmit={onSubmitHandler} onClick={(e)=>e.stopPropagation()} className='flex bg-white rounded-xl max-w-4xl max-md:mx-2'>
         <img src = {assets.regImage} alt = "hotel-reg-icon" 
         className='w-1/2 rounded-xl hidden md:block' />
         <div className='relative flex flex-col items-center md:w-1/2 p-8 md:p-10'>
@@ -21,26 +43,39 @@ const HotelReg = () => {
           <label htmlFor='name' className='font-medium text-gray-500'>
               Hotel Name
           </label>
-          <input id = "name" type="text" placeholder='Type here' className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
+          <input id = "name" 
+          onChange={(e)=>setName(e.target.value)} 
+          value = {name} 
+          type="text" placeholder='Type here' 
+          className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
         </div>
         {/* Contact */}
         <div className='w-full mt-4'>
           <label htmlFor='phone' className='font-medium text-gray-500'>
               Phone
           </label>
-          <input  id = "phone" type="text" placeholder='Type here' className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
+          <input 
+          onChange={(e)=>setContact(e.target.value)} 
+          value = {contact} 
+          id = "phone" type="text" placeholder='Type here' className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
         </div>
         {/* Address */}
         <div className='w-full mt-4'>
           <label htmlFor='address' className='font-medium text-gray-500'>
               Address
           </label>
-          <input  id = "address" type="text" placeholder='Type here' className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
+          <input
+          onChange={(e)=>setAddress(e.target.value)} 
+          value = {address}
+           id = "address" type="text" placeholder='Type here' className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light' required/>
         </div>
         {/* Select City Drop Down */}
         <div className='w-full mt-4 max-w-60 mr-auto'>
           <label htmlFor='city' className='font-medium text-gray-500'>City</label>
-          <select id= "city" required className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light'>
+          <select 
+          onChange={(e)=>setCity(e.target.value)} 
+          value = {city}
+          id= "city" required className='border border-gray-200 rounded w-full px-3 py-2.5 mt-1 outline-indigo-500 font-light'>
               <option value = "">Select City</option>
               {cities.map((city)=>(
                 <option key = {city} value={city} >{city}</option>
