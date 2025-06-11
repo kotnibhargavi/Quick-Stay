@@ -1,8 +1,9 @@
+import transporter from "../configs/nodemailer.js";
 import Booking from "../models/Booking.js"
 import Hotel from "../models/Hotel.js";
 import Room from "../models/Room.js";
 
-//Function to check availibily of room 
+//Function to check availabily of room 
 
 const checkAvailabilty = async ({checkInDate,checkOutDate,room})=>{
     try {
@@ -20,7 +21,7 @@ const checkAvailabilty = async ({checkInDate,checkOutDate,room})=>{
 }
 
 // API to check the availibity of room 
-// Post /api/bookings/check-availibility 
+// Post /api/bookings/check-availability 
 
 export const checkAvailabiltyAPI = async (req,res)=>{
     try {
@@ -41,7 +42,7 @@ export const createBooking = async(req,res)=>{
     try {
         const {checkInDate,checkOutDate,room,guests} = req.body 
         const user = req.user._id 
-    // Before Booking check availibility 
+    // Before Booking check availability 
     const isAvailable = await checkAvailabilty({checkInDate,checkOutDate,room})
     if(!isAvailable){
         return res.json({success:false, message:"Room is not availible"})
@@ -67,7 +68,36 @@ export const createBooking = async(req,res)=>{
         checkOutDate,
         totalPrice,
     })
+    
+    const mailOptions = {
+        from:process.env.SENDER_EMAIL,
+        to: req.user.email,
+        subject: 'Hotel Booking Details',
+        html:`
+        <h2>Your Booking Details</h2>
+        <p>Dear ${req.user.username},</p>
+        <p>Thank you for booking! Here are your details:</p>
+        <ul>
+            <li><strong>Booking ID:</strong> ${booking._id}</li>
+            <li><strong>Hotel Name:</strong> ${roomData.hotel.name}</li>
+            <li><strong>Location:</strong> ${roomData.hotel.address}</li>
+            <li><strong>Date:</strong> ${booking.checkInDate.toDateString()}</li>
+            <li><strong>Booking Amount:</strong> ${process.env.CURRENCY || "$"}{booking.totalPrice}/night</li>
+        </ul>
+        <p>We look forward to welcoming you!</p>
+        <p>If you need to make changes, feel free to contact us</p>
+
+        `
+    }
+
+    try {
+        await transporter.sendMail(mailOptions)
+      } catch (mailError) {
+        console.log("Email sending failed:", mailError.message)
+      }
+
     res.json({success:true, message:"Booking created successfully"})
+
 
     } catch (error) {
         console.log(error)
@@ -93,12 +123,12 @@ export const getUserBookings = async(req,res)=>{
 
 export const getHotelBookings = async(req,res)=>{
     try {
-        const hotel = await Hotel.findOne({owner:req.auth.userId})
+        const hotel = await Hotel.findOne({ owner: req.user._id });
         if(!hotel){
             return res.json({success:false,message:"No hotel found"})
 
         }
-        const bookings = await Bookings.find({hotel:hotel._id}).populate("room hotel user").sort({createdAt:-1})
+        const bookings = await Booking.find({hotel:hotel._id}).populate("room hotel user").sort({createdAt:-1})
         // Total Bookings 
         const totalBookings = bookings.length
         // Total revenue 

@@ -25,24 +25,37 @@ const clerkWebHooks = async (req,res)=>{
         const {data,type} = req.body 
         
 
-        const userData = {
-            _id : data.id,
-            email: data.email_addresses && data.email_addresses[0] ? data.email_addresses[0].email_address : "default@example.com",
-            username : data.first_name + data.last_name,
-            image : data.image_url,
-            }
+        
         // Switch Case for different events 
         
 
 
         switch (type) {
-            case "user.created":
-                const k = await User.create(userData)
-                console.log(k)
+            case "user.created":{
+                const userData = {
+                    _id : data.id,
+                    email: data.email_addresses && data.email_addresses[0] ? data.email_addresses[0].email_address : "default@example.com",
+                    username : data.first_name + data.last_name,
+                    image : data.image_url,
+                    }
+                    await User.create(userData)
+                    break;
+            }
+                
+                
+                
+            case "user.updated":{
+                const userData = {
+                    _id : data.id,
+                    email: data.email_addresses && data.email_addresses[0] ? data.email_addresses[0].email_address : "default@example.com",
+                    username : data.first_name + data.last_name,
+                    image : data.image_url,
+                    }
+                    await User.findByIdAndUpdate(data.id,userData)
                 break;
-            case "user.updated":
-                await User.findByIdAndUpdate(data.id,userData)
-                break;
+            }
+
+                
             case "user.deleted":
                 await User.findByIdAndDelete(data.id);
                 break;
