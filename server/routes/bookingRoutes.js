@@ -1,5 +1,5 @@
 import express from "express"
-import { checkAvailabiltyAPI, createBooking, getHotelBookings, getUserBookings } from "../controllers/bookingcontoller.js"
+import { checkAvailabiltyAPI, createBooking, getHotelBookings, getUserBookings } from "../controllers/bookingContoller.js"
 import { ProtectedRoute } from "../middleware/authMiddleware.js"
 
 const bookingRouter = express.Router()
