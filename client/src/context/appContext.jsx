@@ -8,8 +8,6 @@ axios.defaults.baseURL = import.meta.env.VITE_BACKEND_URL;
 
 const AppContext = createContext()
 
-
-
 export const AppProvider = ({children}) => {
     const currency = import.meta.env.VITE_CURRENCY || "$"
     const navigate = useNavigate()
